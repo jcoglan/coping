@@ -19,7 +19,7 @@ Or is it?
 What if we actually modelled the types of the things strings represent. Things
 like HTML documents, URLs, query strings, CSS color values, SQL statements. What
 if our templating language understood these types and could safely and
-autmatically encode everything for us based on context?
+automatically encode everything for us based on context?
 
 That's what Coping is. A framework for modelling types of strings and safely
 composing them using templating syntax.
