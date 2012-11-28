@@ -7,15 +7,19 @@ module Coping
       @source = source
     end
     
+    def parser
+      @parser ||= parser_class.new
+    end
+    
+    def parser_class
+      Grammar::RawParser
+    end
+    
     def result(env = TOPLEVEL_BINDING)
       eval(template, env, '(coping)', 0)
     end
     
   private
-    
-    def parser
-      @parser ||= Grammar::RawParser.new
-    end
     
     def template
       @template ||= Compiler.compile(parser.parse(@source))
@@ -23,6 +27,22 @@ module Coping
   end
   
   module Grammar
+    module RawText
+      def walk(&block)
+        elements.each(&block)
+      end
+    end
+    
+    module RawString
+      def raw_text
+        text_value
+      end
+      
+      def type
+        :raw_string
+      end
+    end
+    
     module TemplateInstruction
       def flag_names
         return [] unless flags.respond_to?(:first)
@@ -47,16 +67,6 @@ module Coping
       
       def type
         :template_instruction
-      end
-    end
-    
-    module RawString
-      def raw_text
-        text_value
-      end
-      
-      def type
-        :raw_string
       end
     end
   end

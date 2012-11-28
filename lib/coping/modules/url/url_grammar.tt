@@ -1,0 +1,45 @@
+module Coping
+  module Grammar
+    
+    grammar URL
+      include Raw
+      include QueryString
+      
+      rule url_text
+        scheme:url_scheme?
+        host:url_host?
+        port:url_port?
+        path:url_path
+        query:url_query_component?
+        hash:url_hash?
+        <URLText>
+      end
+      
+      rule url_scheme
+        [a-z]+ ":"
+      end
+      
+      rule url_host
+        "//" [^\:\/\s]+
+      end
+      
+      rule url_port
+        ":" [0-9]+
+      end
+      
+      rule url_path
+        [^\?\#\s]+
+      end
+      
+      rule url_query_component
+        "?" query_string
+      end
+      
+      rule url_hash
+        "#" (!ws .)*
+      end
+    end
+    
+  end
+end
+

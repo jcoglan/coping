@@ -1,12 +1,6 @@
 module Coping
   class Compiler
     
-    OUTVAR  = '_out_'
-    TEMPVAR = '_tmp_'
-    OUTINIT = 'StringIO.new'
-    WRITE   = 'write'
-    FINAL   = lambda { |o| "#{o}.rewind\n#{o}.read" }
-    
     def self.compile(parse_tree)
       new(parse_tree).compile
     end
@@ -19,45 +13,63 @@ module Coping
       template = StringIO.new
       template.write("#{out} = #{init}\n")
       skip_newline = false
-      @parse_tree.elements.each do |node|
+      @parse_tree.walk do |node, target_type|
         case node.type
         when :raw_string
           template.write("#{tmp} = #{node.raw_text.inspect}\n")
-          template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n") if skip_newline
-          template.write("#{out}.#{write}(#{tmp})\n")
+          output(template, target_type, skip_newline)
         when :template_instruction
           skip_newline = node.skip_newline?
           if node.output?
-            template.write("#{tmp} = eval(#{node.source_code.inspect}, binding, '(coping)', 0)\n")
-            template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n") if skip_newline
-            template.write("#{out}.#{write}(#{tmp})\n")
+            template.write("#{tmp} = eval(#{node.source_code.inspect}, binding, #{filename.inspect}, 0)\n")
+            output(template, target_type, skip_newline)
           else
             template.write(node.source_code)
             template.write("\n")
           end
         end
       end
-      template.write(FINAL.call(out))
+      template.write(final.call(out))
       template.rewind
       template.read
     end
     
+    def output(template, target_type, skip_newline)
+      if skip_newline
+        template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n")
+      end
+      
+      if target_type
+        template.write("#{tmp} = Coping::Rules.convert(#{tmp}, :#{target_type})\n")
+      end
+      
+      template.write("#{out}.#{write}(#{tmp})\n")
+    end
+    
   private
     
+    def filename
+      '(coping)'
+    end
+    
     def out
-      OUTVAR
+      '_out_'
     end
     
     def tmp
-      TEMPVAR
+      '_tmp_'
     end
     
     def init
-      OUTINIT
+      'StringIO.new'
     end
     
     def write
-      WRITE
+      'write'
+    end
+    
+    def final
+      lambda { |o| "#{o}.rewind\n#{o}.read" }
     end
     
   end

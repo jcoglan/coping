@@ -4,6 +4,45 @@ An experimental type-safe/context-aware templating library for safe composition
 of typed strings.
 
 
+== What?
+
+Far too many tasks in web development still involve slapping strings into each
+other with zero modelling of what those strings mean, how they are encoded, what
+their source is, and so on. Several classes of security holes, including SQL
+injection and cross-site scripting, are the result of injecting text into a
+context where its characters carry new and unanticipated meaning. It is the job
+of web developers to safely encode/escape input strings for the context in which
+they are being used.
+
+Or is it?
+
+What if we actually modelled the types of the things strings represent. Things
+like HTML documents, URLs, query strings, CSS color values, SQL statements. What
+if our templating language understood these types and could safely and
+autmatically encode everything for us based on context?
+
+That's what Coping is. A framework for modelling types of strings and safely
+composing them using templating syntax.
+
+
+== An example
+
+This is all that works so far, but it illustrates what I'm trying to do. Given a
+string containing arbitrary data, injecting into a 'raw' context should
+literally insert its characters, while injecting it where a query string value
+is expected will CGI-escape it.
+
+    text = 'Some &really?! =cool= <text>'
+    
+    raw = Coping::Raw.new('The text is: [%= text %]')
+    raw.result(binding)
+    # => "The text is: Some &really?! =cool= <text>"
+    
+    url = Coping::URL.new('http://example.com/search?q=[%= text %]')
+    url.result(binding)
+    # => "http://example.com/search?q=Some+%26really%3F%21+%3Dcool%3D+%3Ctext%3E"
+
+
 == License
 
 (The MIT License)

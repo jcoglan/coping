@@ -7,7 +7,10 @@ module Coping
   module Grammar
   end
   
-  autoload :Compiler, ROOT + '/coping/compiler'
-  autoload :Raw,      ROOT + '/coping/modules/raw/raw'
+  autoload :Compiler,     ROOT + '/coping/compiler'
+  autoload :Rules,        ROOT + '/coping/rules'
+  autoload :Raw,          ROOT + '/coping/modules/raw/raw'
+  autoload :QueryString,  ROOT + '/coping/modules/query_string/query_string'
+  autoload :URL,          ROOT + '/coping/modules/url/url'
 end
 

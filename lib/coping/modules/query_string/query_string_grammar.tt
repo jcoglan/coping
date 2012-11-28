@@ -1,0 +1,22 @@
+module Coping
+  module Grammar
+    
+    grammar QueryString
+      include Raw
+      
+      rule query_string
+        pair:query_string_pair? rest:(amp:"&" query_string)? <QueryStringText>
+      end
+      
+      rule query_string_pair
+        key:query_string_value eq:"=" value:query_string_value
+      end
+      
+      rule query_string_value
+        (coping_instruction / [^&=#\s]*) <QueryStringValue>
+      end
+    end
+    
+  end
+end
+

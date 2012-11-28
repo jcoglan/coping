@@ -3,7 +3,7 @@ module Coping
     
     grammar Raw
       rule raw_text
-        (coping_instruction / raw_string)*
+        (coping_instruction / raw_string)* <RawText>
       end
       
       rule coping_instruction
