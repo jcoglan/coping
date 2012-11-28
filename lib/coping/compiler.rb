@@ -20,19 +20,19 @@ module Coping
       template.write("#{out} = #{init}\n")
       skip_newline = false
       @parse_tree.elements.each do |node|
-        case node
-        when Grammar::RawString
-          template.write("#{tmp} = #{node.text_value.inspect}\n")
+        case node.type
+        when :raw_string
+          template.write("#{tmp} = #{node.raw_text.inspect}\n")
           template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n") if skip_newline
           template.write("#{out}.#{write}(#{tmp})\n")
-        when Grammar::TemplateInstruction
+        when :template_instruction
           skip_newline = node.skip_newline?
           if node.output?
-            template.write("#{tmp} = eval(#{node.code.text_value.strip.inspect}, binding, '(coping)', 0)\n")
+            template.write("#{tmp} = eval(#{node.source_code.inspect}, binding, '(coping)', 0)\n")
             template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n") if skip_newline
             template.write("#{out}.#{write}(#{tmp})\n")
           else
-            template.write(node.code.text_value.strip)
+            template.write(node.source_code)
             template.write("\n")
           end
         end

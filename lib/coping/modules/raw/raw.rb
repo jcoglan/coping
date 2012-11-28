@@ -40,9 +40,24 @@ module Coping
       def skip_newline?
         close.flags.text_value == '-'
       end
+      
+      def source_code
+        code.text_value.strip
+      end
+      
+      def type
+        :template_instruction
+      end
     end
     
     module RawString
+      def raw_text
+        text_value
+      end
+      
+      def type
+        :raw_string
+      end
     end
   end
   
