@@ -1,6 +1,6 @@
 = Coping
 
-An experimental type-safe/context-aware templating library for safe compisition
+An experimental type-safe/context-aware templating library for safe composition
 of typed strings.
 
 
