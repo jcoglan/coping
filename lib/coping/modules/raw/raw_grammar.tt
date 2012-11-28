@@ -1,0 +1,49 @@
+module Coping
+  module Grammar
+    
+    grammar Raw
+      rule raw_text
+        (coping_instruction / raw_string)*
+      end
+      
+      rule coping_instruction
+        open:coping_instruction_open
+        flags:coping_instruction_open_flags?
+        ws+
+        code:(!coping_instruction_close raw_token)+
+        close:coping_instruction_close
+        <TemplateInstruction>
+      end
+      
+      rule coping_instruction_open
+        "[%"
+      end
+      
+      rule coping_instruction_open_flags
+        first:coping_instruction_open_flag rest:(":" flag:coping_instruction_open_flag)*
+      end
+      
+      rule coping_instruction_open_flag
+        [a-z]+ / "="
+      end
+      
+      rule coping_instruction_close
+        flags:("-")* "%]"
+      end
+      
+      rule raw_string
+        (!coping_instruction_open raw_token)+ <RawString>
+      end
+      
+      rule raw_token
+        "\\" . / .
+      end
+      
+      rule ws
+        [\s\t\n\r]
+      end
+    end
+    
+  end
+end
+
