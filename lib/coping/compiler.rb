@@ -13,19 +13,19 @@ module Coping
       template = StringIO.new
       template.write("#{out} = #{init}\n")
       skip_newline = false
-      @parse_tree.walk do |node, target_type|
+      @parse_tree.walk do |node, encodings|
         if node.is_a?(Grammar::TemplateInstruction)
           skip_newline = node.skip_newline?
           if node.output?
             template.write("#{tmp} = eval(#{node.source_code.inspect}, binding, #{filename.inspect}, 0)\n")
-            output(template, target_type, skip_newline)
+            output(template, encodings, skip_newline)
           else
             template.write(node.source_code)
             template.write("\n")
           end
         else          
           template.write("#{tmp} = #{node.text_value.inspect}\n")
-          output(template, target_type, skip_newline)
+          output(template, [], skip_newline)
         end
       end
       template.write(final.call(out))
@@ -33,13 +33,13 @@ module Coping
       template.read
     end
     
-    def output(template, target_type, skip_newline)
+    def output(template, encodings, skip_newline)
       if skip_newline
         template.write("#{tmp} = #{tmp}.gsub(/\\s*\\n\\s*/, '')\n")
       end
       
-      if target_type
-        template.write("#{tmp} = Coping::Rules.convert(#{tmp}, :#{target_type})\n")
+      if encodings
+        template.write("#{tmp} = Coping::Rules.convert(#{tmp}, #{encodings.inspect})\n")
       end
       
       template.write("#{out}.#{write}(#{tmp})\n")

@@ -27,10 +27,10 @@ composing them using templating syntax.
 
 == An example
 
-This is all that works so far, but it illustrates what I'm trying to do. Given a
-string containing arbitrary data, injecting into a 'raw' context should
-literally insert its characters, while injecting it where a query string value
-is expected will CGI-escape it.
+Some simple examples to illustrate what I'm trying to do. Given a string
+containing arbitrary data, injecting into a 'raw' context should literally
+insert its characters, while injecting it where a query string value is expected
+will CGI-escape it.
 
     text = 'Some &really?! =cool= <text>'
     
@@ -46,18 +46,23 @@ These examples are not just changing the encoding used to inject text based on
 the type of the template. Coping *parses* your templates to understand their
 structure, which allows it to do contextual encoding.
 
-For example, it can tell whether you're trying to inject a value into a query
-string value, or inject the *entire* query string and encode appropriately:
+For example, see you're rendering an HTML document. Text injected into text or
+attribute positions must be HTML-escaped, but text injected into URLs must be
+CGI-escaped. By checking where in the document you're trying to inject text, it
+can use the appropriate encoding.
 
-    params = {'q' => 'Some words'}
+    html = Coping::HTML.new(<<-HTML)
+      <a href="/visit?location=[%= world %]">
+        Visit [%= world %]
+      </a>
+    HTML
     
-    url1 = Coping::URL.new('http://example.com/?foo=[%= params %]')
-    url1.result(binding)
-    # => "http://example.com/?foo=%7B%22q%22%3D%3E%22Some+words%22%7D"
+    world = '<Earth>'
+    html.result(binding)
     
-    url2 = Coping::URL.new('http://example.com/?[%= params %]')
-    url2.result(binding)
-    # => "http://example.com/?q=Some+words"
+    # =>  <a href="/visit?location=%3CEarth%3E">
+    #       Visit &lt;Earth&gt;
+    #     </a>
 
 
 == License

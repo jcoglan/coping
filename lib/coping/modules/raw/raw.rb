@@ -7,10 +7,6 @@ module Coping
       @source = source
     end
     
-    def parser
-      @parser ||= parser_class.new
-    end
-    
     def parser_class
       Grammar::RawParser
     end
@@ -19,16 +15,28 @@ module Coping
       eval(template, env, '(coping)', 0)
     end
     
+    def walk(encodings = [], &block)
+      parse_tree.walk(encodings, &block)
+    end
+    
   private
     
+    def parser
+      @parser ||= parser_class.new
+    end
+    
+    def parse_tree
+      @parse_tree ||= parser.parse(@source)
+    end
+    
     def template
-      @template ||= Compiler.compile(parser.parse(@source))
+      @template ||= Compiler.compile(parse_tree)
     end
   end
   
   module Grammar
     module RawText
-      def walk(&block)
+      def walk(encodings = [], &block)
         elements.each(&block)
       end
     end
@@ -53,6 +61,10 @@ module Coping
       
       def source_code
         code.text_value.strip
+      end
+      
+      def walk(encodings = [], &block)
+        block.call(self)
       end
     end
   end

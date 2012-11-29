@@ -1,0 +1,101 @@
+module Coping
+  module Grammar
+    
+    grammar HTML
+      include Raw
+      include URL
+      
+      rule html_text
+        html_document
+      end
+      
+      rule html_coping_instruction
+        coping_instruction <HTMLTemplateInstruction>
+      end
+      
+      rule html_document
+        (html_coping_instruction / html_tag / html_text_node)* <HTMLText>
+      end
+      
+      rule html_tag
+        html_doctype_tag / html_comment_tag / html_semantic_tag
+      end
+      
+      rule html_doctype_tag
+        o:("<!" ws* ("doctype" / "DOCTYPE")) attributes:(s:ws+ html_tag_attribute_value)* c:(ws* ">") <HTMLDoctypeTag>
+      end
+      
+      rule html_comment_tag
+        o:"<!--" b:(!"-->" .)* c:"-->" <HTMLCommentTag>
+      end
+      
+      rule html_semantic_tag
+        html_opening_tag / html_self_closing_tag / html_closing_tag
+      end
+      
+      rule html_opening_tag
+        o:"<" b:html_tag_contents c:(ws* ">") <HTMLOpeningTag>
+      end
+      
+      rule html_self_closing_tag
+        o:"<" b:html_tag_contents c:(ws* "/>")  <HTMLOpeningTag>
+      end
+      
+      rule html_closing_tag
+        o:"</" name:html_tag_name c:(ws* ">") <HTMLClosingTag>
+      end
+      
+      rule html_tag_contents
+        name:html_tag_name attributes:(ws+ attr:html_tag_attribute)* <HTMLTagContents>
+      end
+      
+      rule html_tag_name
+        [A-Za-z] [A-Za-z0-9]* <HTMLTagName>
+      end
+      
+      rule html_tag_attribute
+        name:html_tag_attribute_name eq:"=" value:html_tag_attribute_value <HTMLTagAttribute>
+      end
+      
+      rule html_tag_attribute_name
+        [A-Za-z] [A-Za-z0-9_-]*
+      end
+      
+      rule html_tag_attribute_value
+        o:'"' b:html_double_quoted_text c:'"' /
+        o:"'" b:html_single_quoted_text c:"'" /
+        html_unquoted_text
+      end
+      
+      rule html_double_quoted_text
+        (html_coping_instruction / html_double_quoted_string)* <HTMLAttributeText>
+      end
+      
+      rule html_double_quoted_string
+        (!coping_instruction_open [^">])+ 
+      end
+      
+      rule html_single_quoted_text
+        (html_coping_instruction / html_single_quoted_string)* <HTMLAttributeText>
+      end
+      
+      rule html_single_quoted_string
+        (!coping_instruction_open [^'>])+
+      end
+      
+      rule html_unquoted_text
+        (html_coping_instruction / html_unquoted_string)* <HTMLAttributeText>
+      end
+      
+      rule html_unquoted_string
+        (!coping_instruction_open [^>\s\t\n\r])+
+      end
+      
+      rule html_text_node
+        (!coping_instruction_open [^<])+ <HTMLTextNode>
+      end
+    end
+    
+  end
+end
+
