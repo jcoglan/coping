@@ -32,7 +32,7 @@ module Coping
       end
       
       rule raw_string
-        (!coping_instruction_open raw_token)+ <RawString>
+        (!coping_instruction_open raw_token)+
       end
       
       rule raw_token

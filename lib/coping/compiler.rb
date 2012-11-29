@@ -14,11 +14,7 @@ module Coping
       template.write("#{out} = #{init}\n")
       skip_newline = false
       @parse_tree.walk do |node, target_type|
-        case node.type
-        when :raw_string
-          template.write("#{tmp} = #{node.raw_text.inspect}\n")
-          output(template, target_type, skip_newline)
-        when :template_instruction
+        if node.is_a?(Grammar::TemplateInstruction)
           skip_newline = node.skip_newline?
           if node.output?
             template.write("#{tmp} = eval(#{node.source_code.inspect}, binding, #{filename.inspect}, 0)\n")
@@ -27,6 +23,9 @@ module Coping
             template.write(node.source_code)
             template.write("\n")
           end
+        else          
+          template.write("#{tmp} = #{node.text_value.inspect}\n")
+          output(template, target_type, skip_newline)
         end
       end
       template.write(final.call(out))

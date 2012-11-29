@@ -14,14 +14,38 @@ module Coping
       def walk(&block)
         %w[scheme host port path].each do |part|
           value = __send__(part)
-          block.call(value.extend(RawString)) unless value.text_value == ''
+          if value.respond_to?(:walk)
+            value.walk(&block)
+          elsif value.text_value != ''
+            block.call(value)
+          end
         end
         unless query.text_value == ''
-          block.call(query.elements.first.extend(RawString))
+          block.call(query.q)
           query.query_string.walk(&block) if query.query_string.respond_to?(:walk)
         end
-        h = hash
-        block.call(h.extend(RawString)) unless h.text_value == ''
+        block.call(hash) unless hash.text_value == ''
+      end
+    end
+    
+    module URLScheme
+      def walk(&block)
+        block.call(name)
+        block.call(colon)
+      end
+    end
+    
+    module URLDomain
+      def walk(&block)
+        block.call(slash)
+        block.call(domain)
+      end
+    end
+    
+    module URLPort
+      def walk(&block)
+        block.call(colon)
+        block.call(number)
       end
     end
   end

@@ -33,16 +33,6 @@ module Coping
       end
     end
     
-    module RawString
-      def raw_text
-        text_value
-      end
-      
-      def type
-        :raw_string
-      end
-    end
-    
     module TemplateInstruction
       def flag_names
         return [] unless flags.respond_to?(:first)
@@ -63,10 +53,6 @@ module Coping
       
       def source_code
         code.text_value.strip
-      end
-      
-      def type
-        :template_instruction
       end
     end
   end

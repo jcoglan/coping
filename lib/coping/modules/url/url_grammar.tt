@@ -16,23 +16,23 @@ module Coping
       end
       
       rule url_scheme
-        [a-z]+ ":"
+        name:(coping_instruction / [a-z]+) colon:":" <URLScheme>
       end
       
       rule url_host
-        "//" [^\:\/\s]+
+        slash:"//" domain:(coping_instruction / (!coping_instruction_open [^\:\/\s])+) <URLDomain>
       end
       
       rule url_port
-        ":" [0-9]+
+        colon:":" number:(coping_instruction / (!coping_instruction_open [0-9])+) <URLPort>
       end
       
       rule url_path
-        [^\?\#\s]+
+        coping_instruction / [^\?\#\s]+
       end
       
       rule url_query_component
-        "?" query_string:query_string?
+        q:"?" query_string:query_string?
       end
       
       rule url_hash
