@@ -4,6 +4,10 @@ require 'treetop'
 module Coping
   ROOT = File.expand_path('..', __FILE__)
   
+  module Formats
+    autoload :CGI, ROOT + '/coping/formats/cgi'
+  end
+  
   module Grammar
   end
   

@@ -10,13 +10,19 @@ module Coping
     end
     
     def self.convert(value, target_type)
-      block = @rules[value.class][target_type]
+      types = @rules[target_type]
+      match = types.keys.find { |k| value.is_a?(k) }
+      block = types[match]
       return value unless block
       block.call(value)
     end
     
-    define String, :query_string_value do |value|
-      CGI.escape(value)
+    define :query_string_value, Object do |value|
+      Formats::CGI::Value.new(value)
+    end
+    
+    define :query_string, Hash do |value|
+      Formats::CGI::Map.new(value)
     end
     
   end

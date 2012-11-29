@@ -30,6 +30,12 @@ describe Coping::URL do
     template.result(binding).should == "/foo?q=Some+%26really%3F%21+%3Dcool%3D+%3Ctext%3E&n=42"
   end
   
+  it "CGI-encodes name-value maps" do
+    template = Coping::URL.new("/foo?[%= params %]")
+    params = {:q => input}
+    template.result(binding).should == "/foo?q=Some+%26really%3F%21+%3Dcool%3D+%3Ctext%3E"
+  end
+  
   it "matches URLs with no query string" do
     template = Coping::URL.new("/foo?")
     template.result(binding).should == "/foo?"

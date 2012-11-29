@@ -4,8 +4,14 @@ module Coping
     grammar QueryString
       include Raw
       
+      rule query_string_text
+        query_string
+      end
+      
       rule query_string
-        pair:query_string_pair? rest:(amp:"&" query_string)? <QueryStringText>
+        ( pair:query_string_pair rest:(amp:"&" query_string)? /
+          coping_instruction
+        ) <QueryStringText>
       end
       
       rule query_string_pair

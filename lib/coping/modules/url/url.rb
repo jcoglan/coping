@@ -16,9 +16,9 @@ module Coping
           value = __send__(part)
           block.call(value.extend(RawString)) unless value.text_value == ''
         end
-        if query.respond_to?(:query_string)
+        unless query.text_value == ''
           block.call(query.elements.first.extend(RawString))
-          query.query_string.walk(&block)
+          query.query_string.walk(&block) if query.query_string.respond_to?(:walk)
         end
         h = hash
         block.call(h.extend(RawString)) unless h.text_value == ''

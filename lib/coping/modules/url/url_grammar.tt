@@ -32,7 +32,7 @@ module Coping
       end
       
       rule url_query_component
-        "?" query_string
+        "?" query_string:query_string?
       end
       
       rule url_hash
